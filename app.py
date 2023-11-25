@@ -1,0 +1,54 @@
+from flask import Flask, redirect, render_template, request, url_for
+from pymongo import MongoClient
+from bson import ObjectId
+from werkzeug.routing import BaseConverter
+
+app = Flask(__name__)
+client = MongoClient('mongodb://localhost:27017/')  # Connect to your MongoDB instance
+db = client['blog_db']  # Use or create a database named 'blog_db'
+posts_collection = db['posts']  # Create or use a collection named 'posts'
+
+class ObjectIdConverter(BaseConverter):
+    def to_python(self, value):
+        try:
+            return ObjectId(value)
+        except:
+            raise ValueError()
+
+    def to_url(self, value):
+        return str(value)
+
+app.url_map.converters['ObjectId'] = ObjectIdConverter
+
+@app.route('/')
+def index():
+    posts = list(posts_collection.find())  # Retrieve all posts from MongoDB
+    return render_template('index.html', posts=posts)
+
+@app.route('/create', methods=['GET', 'POST'])
+def create_post():
+    if request.method == 'POST':
+        title = request.form['title']
+        content = request.form['content']
+        new_post = {'title': title, 'content': content}
+        posts_collection.insert_one(new_post)  # Insert a new post into MongoDB
+        return redirect(url_for('index'))
+    return render_template('create_post.html')
+
+@app.route('/edit/<ObjectId:post_id>', methods=['GET', 'POST'])
+def edit_post(post_id):
+    post = posts_collection.find_one({'_id': post_id})
+    if request.method == 'POST':
+        post['title'] = request.form['title']
+        post['content'] = request.form['content']
+        posts_collection.replace_one({'_id': post_id}, post)  # Update the post in MongoDB
+        return redirect(url_for('index'))
+    return render_template('edit_post.html', post=post)
+
+@app.route('/delete/<ObjectId:post_id>')
+def delete_post(post_id):
+    posts_collection.delete_one({'_id': post_id})  # Delete the post from MongoDB
+    return redirect(url_for('index'))
+
+if __name__ == '__main__':
+    app.run(debug=True)
