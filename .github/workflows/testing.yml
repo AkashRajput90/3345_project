@@ -24,7 +24,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Run tests
-      run: |
-        # Add your test commands here
-        # For example: pytest
+
+    - name: Run unit tests
+      run: pytest test_application.py
+
