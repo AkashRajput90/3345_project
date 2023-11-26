@@ -1,6 +1,6 @@
 # test_application.py
 
-from your_application_file import app
+from app import app
 import pytest
 
 # Example test to check if the index route returns a 200 status code
