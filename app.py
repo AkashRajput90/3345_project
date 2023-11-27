@@ -4,7 +4,7 @@ from bson import ObjectId
 from werkzeug.routing import BaseConverter
 
 app = Flask(__name__)
-client = MongoClient('mongodb://localhost:27017/')  # Connect to your MongoDB instance
+client = MongoClient('mongodb://mongo:27017/')  # Connect to your MongoDB instance
 db = client['blog_db']  # Use or create a database named 'blog_db'
 posts_collection = db['posts']  # Create or use a collection named 'posts'
 
@@ -35,7 +35,7 @@ def create_post():
         return redirect(url_for('index'))
     return render_template('create_post.html')
 
-@app.route('/edit/<ObjectId:post_id>', methods=['GET', 'POST'])
+@app.route('/edit_post/<ObjectId:post_id>', methods=['GET', 'POST'])
 def edit_post(post_id):
     post = posts_collection.find_one({'_id': post_id})
     if request.method == 'POST':
@@ -45,10 +45,15 @@ def edit_post(post_id):
         return redirect(url_for('index'))
     return render_template('edit_post.html', post=post)
 
-@app.route('/delete/<ObjectId:post_id>')
+
+@app.route('/delete_post/<ObjectId:post_id>', methods=['GET', 'POST'])
 def delete_post(post_id):
-    posts_collection.delete_one({'_id': post_id})  # Delete the post from MongoDB
-    return redirect(url_for('index'))
+    if request.method == 'POST':
+        posts_collection.delete_one({'_id': post_id})  # Delete the post from MongoDB
+        return redirect(url_for('index'))
+    # Handle other cases, like GET requests or invalid post_id
+    return "Invalid request"
+
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True, host="0.0.0.0", port=80)
