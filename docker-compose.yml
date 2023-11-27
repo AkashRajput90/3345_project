@@ -1,0 +1,19 @@
+services:
+  flask-app:
+    build: .
+    ports:
+      - "80:80"
+    environment:
+      MONGO_URI: 'mongodb://mongo:27017/blog_db'
+    networks:
+      - my_network
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    networks:
+      - my_network
+
+networks:
+  my_network:
