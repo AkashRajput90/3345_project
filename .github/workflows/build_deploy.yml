@@ -35,7 +35,8 @@ jobs:
           docker build -t 3345blog.azurecr.io/blogv2:${{ github.sha }} .
           docker push 3345blog.azurecr.io/blogv2:${{ github.sha }}
 
-      -
+      
+      - name: Log in to Azure
         uses: 'azure/aci-deploy@v1'
         with:
           resource-group: blogacigroup
