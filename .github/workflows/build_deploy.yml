@@ -1,4 +1,4 @@
-name: Build and Push Docker Container
+name: Deploy to Azure Container Instances
 
 on:
   push:
@@ -9,28 +9,45 @@ on:
 jobs:
   docker:
     runs-on: ubuntu-latest
+
     steps:
-      -
-        name: Set up QEMU
+      - name: Set up QEMU
         uses: docker/setup-qemu-action@v2
-      -
-        name: Set up Docker Buildx
+
+      - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      -
-        name: Checkout code
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      -
-        name: Login to Azure Container Registry
+      - name: Login to Azure Container Registry
         uses: azure/docker-login@v1
         with:
           login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
           username: ${{ secrets.REGISTRY_USERNAME }}
           password: ${{ secrets.REGISTRY_PASSWORD }}
 
-      -
-        name: Build and Push to ACR
+      - name: Build and Push to ACR
         run: |
           docker build -t 3345blog.azurecr.io/blogv2:${{ github.sha }} .
           docker push 3345blog.azurecr.io/blogv2:${{ github.sha }}
+
+  deploy-to-aci:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Log in to Azure
+        run: |
+          az login  --service-principal --tenant ${{ secrets.AZURE_TENANT_ID }} --username ${{ secrets.AZURE_CLIENT_ID }} --password ${{ secrets.AZURE_CLIENT_SECRET }}
+
+      - name: 'Deploy to Azure Container Instances'
+        uses: 'azure/aci-deploy@v1'
+        with:
+          resource-group: blogacigroup
+          dns-name-label: blogv2
+          image: blogv2.azurecr.io/blogv2:${{ github.sha }}
+          registry-username: ${{ secrets.REGISTRY_USERNAME }}
+          registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+          name: blogaci
+          restart-policy: Never
+          location: 'Canada Central'
