@@ -34,3 +34,15 @@ jobs:
         run: |
           docker build -t 3345blog.azurecr.io/blogv2:${{ github.sha }} .
           docker push 3345blog.azurecr.io/blogv2:${{ github.sha }}
+
+      -
+        uses: 'azure/aci-deploy@v1'
+        with:
+          resource-group: blogacigroup
+          dns-name-label: blogv2
+          image: acrflaskv4.azurecr.io/blogv2:${{ github.sha }}
+          registry-username: ${{ secrets.REGISTRY_USERNAME }}
+          registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+          name: blogaci
+          restart-policy: Never
+          location: 'Canada Central'
