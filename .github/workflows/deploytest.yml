@@ -1,27 +1,25 @@
-name: Deploy to Testing
+name: Deploy to Azure Container Instances
 
 on:
   push:
-    branches: [main] # Adjust branch as needed
-
+    branches:
+      - main
+  workflow_dispatch:
 jobs:
-  deploy:
+  deploy-to-aci:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.x'
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-
-    - name: Deploy to testing
-      run: |
-        # Add commands to deploy to your testing environment
+      - name: Log in to Azure
+        run: |
+          az login  --service-principal --tenant ${{ secrets.AZURE_TENANT_ID }} --username ${{ secrets.AZURE_CLIENT_ID }} --password ${{ secrets.AZURE_CLIENT_SECRET }}
+      - name: 'Deploy to Azure Container Instances'
+        uses: 'azure/aci-deploy@v1'
+        with:
+          resource-group: blogacigroup
+          dns-name-label: blogv2
+          image: blogv2.azurecr.io/blogv2:${{ github.sha }}
+          registry-username: ${{ secrets.REGISTRY_USERNAME }}
+          registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+          name: blogaci
+          restart-policy: Never
+          location: 'Canada Central'
