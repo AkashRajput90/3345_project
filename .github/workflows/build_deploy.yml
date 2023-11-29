@@ -45,7 +45,7 @@ jobs:
         with:
           resource-group: blogacigroup
           dns-name-label: blogv2
-          image: blogv2.azurecr.io/blogv2:${{ github.sha }}
+          image: 3345blog.azurecr.io/blogv2:${{ github.sha }}
           registry-username: ${{ secrets.REGISTRY_USERNAME }}
           registry-password: ${{ secrets.REGISTRY_PASSWORD }}
           name: blogaci
