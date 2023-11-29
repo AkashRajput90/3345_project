@@ -30,9 +30,8 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           build: |
-             docker build -t ${{ secrets.DOCKER_NAME }}/blogv1:latest -f Dockerfile .
+             docker build -t akashlambton/blogv1:latest -f Dockerfile .
           push: true
-          tags: ${{ secrets.DOCKER_NAME }}/blogv1:latest
           file: Dockerfile
 
       - name: Docker Login for ACR
