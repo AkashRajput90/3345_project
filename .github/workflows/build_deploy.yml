@@ -29,6 +29,8 @@ jobs:
       - name: Build Docker Container
         uses: docker/build-push-action@v2
         with:
+          build: |
+             docker build -t ${{ secrets.DOCKER_NAME }}/blogv1:${{ github.sha }} -f Dockerfile .
           push: true
           tags: ${{ secrets.DOCKER_NAME }}/blogv1:${{ github.sha }}
           file: Dockerfile
