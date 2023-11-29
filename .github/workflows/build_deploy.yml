@@ -27,7 +27,7 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: ${{ secrets.DOCKER_NAME }}/blogv1:${{ github.sha }}
+          tags: ${{ secrets.DOCKER_NAME }}/blogv2:${{ github.sha }}
           file: Dockerfile
 
       -
@@ -47,5 +47,5 @@ jobs:
         uses: docker/build-push-action@v2
         with:
           push: true
-          tags: 3345blog.azurecr.io/blogv1:${{ github.sha }}
+          tags: 3345blog.azurecr.io/blogv2:${{ github.sha }}
           file: Dockerfile
