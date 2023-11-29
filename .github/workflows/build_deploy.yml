@@ -27,12 +27,8 @@ jobs:
           password: ${{ secrets.DOCKER_TOKEN }}
 
       - name: Build Docker Container
-        uses: docker/build-push-action@v2
-        with:
-          build: |
+        run: |
              docker build -t akashlambton/blogv1:latest -f Dockerfile .
-          push: true
-          file: Dockerfile
 
       - name: Docker Login for ACR
         uses: azure/docker-login@v1
