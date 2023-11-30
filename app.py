@@ -4,7 +4,7 @@ from bson import ObjectId
 from werkzeug.routing import BaseConverter
 
 app = Flask(__name__)
-client = MongoClient('mongodb://mongo:27017/')  # Connect to your MongoDB instance
+client = MongoClient('mongodb://192.168.0.143:27017/')  # Connect to your MongoDB instance
 db = client['blog_db']  # Use or create a database named 'blog_db'
 posts_collection = db['posts']  # Create or use a collection named 'posts'
 
