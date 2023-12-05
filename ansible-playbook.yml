@@ -28,7 +28,7 @@
         environment:
           acr_username: "{{ secrets.REGISTRY_USERNAME }}"
           acr_password: "{{ secrets.REGISTRY_PASSWORD }}"
-          acr_url: "your-acr-name.azurecr.io"
+          acr_url: "3345blog.azurecr.io/blogv2"
 
         name: blogaci
         image: "3345blog.azurecr.io/blogv2:{{ github.sha }}"
