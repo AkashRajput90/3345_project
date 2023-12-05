@@ -1,0 +1,35 @@
+---
+- hosts: localhost
+  tasks:
+    - name: Docker YUM
+      yum:
+        name: 
+          - docker
+          - python3-pip
+        state: present
+
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Pull Docker image for Flask application
+      command: "docker pull 3345blog.azurecr.io/blogv2:{{ github.sha }}"
+      register: pull_output
+      environment:
+        REGISTRY_USERNAME: "{{ secrets.REGISTRY_USERNAME }}"
+        REGISTRY_PASSWORD: "{{ secrets.REGISTRY_PASSWORD }}"
+
+    - name: Create Flask Docker container
+      community.docker.docker_container:
+        name: blogaci
+        image: "3345blog.azurecr.io/blogv2:{{ github.sha }}"
+        state: started
+        ports:
+          - "80:80"
+        restart_policy: never
+      environment:
+        MONGO_URI: "mongodb://mongo:27017/blog_db"
+      login_username: "{{ secrets.REGISTRY_USERNAME }}"
+      login_password: "{{ secrets.REGISTRY_PASSWORD }}"
