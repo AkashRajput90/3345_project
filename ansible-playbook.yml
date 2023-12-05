@@ -1,11 +1,17 @@
+
 ---
 - name: Deploy Flask App to Azure Container Instances
   hosts: localhost
+  become: yes
   tasks:
-    - name: Docker YUM
-      yum:
+    - name: Update apt cache
+      apt:
+        update_cache: yes
+
+    - name: Install Docker and Python 3 pip
+      apt:
         name:
-          - docker
+          - docker.io
           - python3-pip
         state: present
 
@@ -14,6 +20,8 @@
         name: docker
         state: started
         enabled: yes
+
+    # Add the rest of your tasks related to deploying to Azure Container Instances...
 
     - name: Log in to Azure Container Registry
       command: >
