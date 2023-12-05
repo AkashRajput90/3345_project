@@ -30,6 +30,6 @@
           - "80:80"
         restart_policy: never
       environment:
-        MONGO_URI: "mongodb://mongo:27017/blog_db"
+        MONGO_URI: "mongodb://blogdbaccount:DJeiV2yZlFvd2EpoLQNNYCdEwmrgLsy8nkirggYZGHlw2fXSHpCXP7GnijKugivxR24ZW4uhlvTwACDbgxdwUQ==@blogdbaccount.mongo.cosmos.azure.com:10255/?ssl=true&retrywrites=false&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@blogdbaccount@"
       login_username: "{{ secrets.REGISTRY_USERNAME }}"
       login_password: "{{ secrets.REGISTRY_PASSWORD }}"
