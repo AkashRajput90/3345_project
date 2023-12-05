@@ -32,22 +32,23 @@ jobs:
           docker build -t 3345blog.azurecr.io/blogv2:${{ github.sha }} .
           docker push 3345blog.azurecr.io/blogv2:${{ github.sha }}
 
-  deploy-to-aci:
+  deploy-to-aci-with-ansible:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Log in to Azure
-        run: |
-          az login  --service-principal --tenant ${{ secrets.AZURE_TENANT_ID }} --username ${{ secrets.AZURE_CLIENT_ID }} --password ${{ secrets.AZURE_CLIENT_SECRET }}
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: 'Deploy to Azure Container Instances'
-        uses: 'azure/aci-deploy@v1'
-        with:
-          resource-group: blogacigroup
-          dns-name-label: blogv2
-          image: 3345blog.azurecr.io/blogv2:${{ github.sha }}
-          registry-username: ${{ secrets.REGISTRY_USERNAME }}
-          registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-          name: blogaci
-          restart-policy: Never
-          location: 'Canada Central'
+      - name: Install Ansible
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ansible
+
+      - name: Run Ansible playbook for ACI deployment
+        run: ansible-playbook deploy.yml
+        env:
+          REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
+          REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
