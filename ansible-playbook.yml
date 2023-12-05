@@ -1,5 +1,6 @@
 ---
-- hosts: localhost
+- name: Deploy Flask App to Azure Container Instances
+  hosts: localhost
   tasks:
     - name: Docker YUM
       yum:
