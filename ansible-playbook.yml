@@ -4,7 +4,7 @@
   tasks:
     - name: Docker YUM
       yum:
-        name: 
+        name:
           - docker
           - python3-pip
         state: present
@@ -22,14 +22,16 @@
         REGISTRY_USERNAME: "{{ secrets.REGISTRY_USERNAME }}"
         REGISTRY_PASSWORD: "{{ secrets.REGISTRY_PASSWORD }}"
 
- 
-   - name: Log in to Azure Container Registry
-        command: docker login -u {{ acr_username }} -p {{ acr_password }} {{ acr_url }}
-        environment:
-          acr_username: "{{ secrets.REGISTRY_USERNAME }}"
-          acr_password: "{{ secrets.REGISTRY_PASSWORD }}"
-          acr_url: "3345blog.azurecr.io/blogv2"
+    - name: Log in to Azure Container Registry
+      command: >
+        docker login -u {{ acr_username }} -p {{ acr_password }} {{ acr_url }}
+      environment:
+        acr_username: "{{ secrets.REGISTRY_USERNAME }}"
+        acr_password: "{{ secrets.REGISTRY_PASSWORD }}"
+        acr_url: "3345blog.azurecr.io/blogv2"
 
+    - name: Create Flask Docker container
+      community.docker.docker_container:
         name: blogaci
         image: "3345blog.azurecr.io/blogv2:{{ github.sha }}"
         state: started
