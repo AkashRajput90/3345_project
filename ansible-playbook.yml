@@ -15,30 +15,11 @@
         state: started
         enabled: yes
 
-    - name: Pull Docker image for Flask application
-      command: "docker pull 3345blog.azurecr.io/blogv2:{{ github.sha }}"
-      register: pull_output
-      environment:
-        REGISTRY_USERNAME: "{{ secrets.REGISTRY_USERNAME }}"
-        REGISTRY_PASSWORD: "{{ secrets.REGISTRY_PASSWORD }}"
-
     - name: Log in to Azure Container Registry
       command: >
-        docker login -u {{ acr_username }} -p {{ acr_password }} {{ acr_url }}
-      environment:
-        acr_username: "{{ secrets.REGISTRY_USERNAME }}"
-        acr_password: "{{ secrets.REGISTRY_PASSWORD }}"
-        acr_url: "3345blog.azurecr.io/blogv2"
+        az acr login --username {{ secrets.REGISTRY_USERNAME }} --password {{ secrets.REGISTRY_PASSWORD }} --name 3345blog.azurecr.io
 
-    - name: Create Flask Docker container
-      community.docker.docker_container:
-        name: blogaci
-        image: "3345blog.azurecr.io/blogv2:{{ github.sha }}"
-        state: started
-        ports:
-          - "80:80"
-        restart_policy: never
-      environment:
-        MONGO_URI: "mongodb://blogdbaccount:DJeiV2yZlFvd2EpoLQNNYCdEwmrgLsy8nkirggYZGHlw2fXSHpCXP7GnijKugivxR24ZW4uhlvTwACDbgxdwUQ==@blogdbaccount.mongo.cosmos.azure.com:10255/?ssl=true&retrywrites=false&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@blogdbaccount@"
-      login_username: "{{ secrets.REGISTRY_USERNAME }}"
-      login_password: "{{ secrets.REGISTRY_PASSWORD }}"
+    - name: Create Flask Docker container on Azure Container Instances
+      command: >
+        az container create --resource-group blogacigroup --name blogaci --image 3345blog.azurecr.io/blogv2:{{ github.sha }} --cpu 1 --memory 1.5 --registry-username {{ secrets.REGISTRY_USERNAME }} --registry-password {{ secrets.REGISTRY_PASSWORD }} --dns-name-label blogv2 --ports 80
+
