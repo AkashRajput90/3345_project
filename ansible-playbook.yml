@@ -1,3 +1,4 @@
+---
 - name: Deploy Flask App to Azure Container Instances
   hosts: localhost
   become: yes
