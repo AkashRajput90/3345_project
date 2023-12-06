@@ -1,8 +1,7 @@
 ---
 - name: Deploy to Azure Container Instances
-  hosts: localhost
-  connection: local
-  gather_facts: no
+  hosts: all
+  become: yes
 
   tasks:
     - name: Login to Azure Container Registry
