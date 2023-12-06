@@ -37,7 +37,7 @@ jobs:
           sudo apt install -y ansible
 
       - name: Run Ansible playbook for ACI deployment
-        run: ansible-playbook ansible-playbook-aci.yml
+        run: ansible-playbook ansible-playbook.yml
         env:
           REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
           REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
