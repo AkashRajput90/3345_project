@@ -24,7 +24,7 @@ app.url_map.converters['ObjectId'] = ObjectIdConverter
 def index():
     posts = list(posts_collection.find())  # Retrieve all posts from MongoDB
     return render_template('index.html', posts=posts)
-
+ 
 @app.route('/create', methods=['GET', 'POST'])
 def create_post():
     if request.method == 'POST':
