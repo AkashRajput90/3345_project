@@ -1,28 +1,7 @@
-
----
 - name: Deploy Flask App to Azure Container Instances
   hosts: localhost
   become: yes
   tasks:
-    - name: Update apt cache
-      apt:
-        update_cache: yes
-
-    - name: Install Docker and Python 3 pip
-      apt:
-        name:
-          - docker.io
-          - python3-pip
-        state: present
-
-    - name: Start Docker service
-      service:
-        name: docker
-        state: started
-        enabled: yes
-
-    # Add the rest of your tasks related to deploying to Azure Container Instances...
-
     - name: Log in to Azure Container Registry
       command: >
         az acr login --username {{ secrets.REGISTRY_USERNAME }} --password {{ secrets.REGISTRY_PASSWORD }} --name 3345blog.azurecr.io
@@ -30,4 +9,3 @@
     - name: Create Flask Docker container on Azure Container Instances
       command: >
         az container create --resource-group blogacigroup --name blogaci --image 3345blog.azurecr.io/blogv2:{{ github.sha }} --cpu 1 --memory 1.5 --registry-username {{ secrets.REGISTRY_USERNAME }} --registry-password {{ secrets.REGISTRY_PASSWORD }} --dns-name-label blogv2 --ports 80
-
