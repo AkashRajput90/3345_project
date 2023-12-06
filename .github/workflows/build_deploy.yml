@@ -32,23 +32,14 @@ jobs:
           docker build -t 3345blog.azurecr.io/blogv2:${{ github.sha }} .
           docker push 3345blog.azurecr.io/blogv2:${{ github.sha }}
 
-  deploy-to-aci-with-ansible:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Deploy to Azure Container Instances
 
       - name: Install Ansible
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ansible
+          pip install ansible
 
-      - name: Run Ansible playbook for ACI deployment
-        run: ansible-playbook ansible-playbook.yml
+      - name: Set up environment variables
         env:
           REGISTRY_USERNAME: ${{ secrets.REGISTRY_USERNAME }}
           REGISTRY_PASSWORD: ${{ secrets.REGISTRY_PASSWORD }}
-          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        run: ansible-playbook ansible-playbook.yml
