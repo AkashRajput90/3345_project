@@ -25,3 +25,5 @@ class TestApp(unittest.TestCase):
             
             # For example, you can check if 'Post 1' exists in the rendered HTML
             self.assertIn(b'Post 1', response.data)
+
+
