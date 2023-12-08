@@ -30,10 +30,20 @@ def create_post():
     if request.method == 'POST':
         title = request.form['title']
         content = request.form['content']
-        new_post = {'title': title, 'content': content}
+        
+        # Include the shard key field and value
+        scale_value = 'your_scale_value_here'  # Determine the appropriate value for your shard key field
+
+        new_post = {
+            'title': title,
+            'content': content,
+            'scale': scale_value  # Include the shard key field with its value
+        }
+
         posts_collection.insert_one(new_post)  # Insert a new post into MongoDB
         return redirect(url_for('index'))
     return render_template('create_post.html')
+
 
 @app.route('/edit_post/<ObjectId:post_id>', methods=['GET', 'POST'])
 def edit_post(post_id):
