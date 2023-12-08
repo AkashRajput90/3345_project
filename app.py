@@ -2,7 +2,6 @@ from flask import Flask, redirect, render_template, request, url_for
 from pymongo import MongoClient
 from bson import ObjectId
 from werkzeug.routing import BaseConverter
-import hashlib
 
 app = Flask(__name__)
 client = MongoClient('mongodb://blogdbaccount:DJeiV2yZlFvd2EpoLQNNYCdEwmrgLsy8nkirggYZGHlw2fXSHpCXP7GnijKugivxR24ZW4uhlvTwACDbgxdwUQ==@blogdbaccount.mongo.cosmos.azure.com:10255/?ssl=true&retrywrites=false&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@blogdbaccount@')  # Connect to your MongoDB instance
@@ -33,13 +32,7 @@ def create_post():
         content = request.form['content']
         
         # Include the shard key field and value
-        title = request.form['title']
-        shard_key_value = hashlib.sha256(title.encode()).hexdigest()
-
-
-
-        
-        #scale_value = 'your_scale_value_here'  # Determine the appropriate value for your shard key field
+        scale_value = 'your_scale_value_here'  # Determine the appropriate value for your shard key field
 
         new_post = {
             'title': title,
