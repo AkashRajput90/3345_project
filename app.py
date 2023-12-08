@@ -19,7 +19,7 @@ class ObjectIdConverter(BaseConverter):
         return str(value)
  
 app.url_map.converters['ObjectId'] = ObjectIdConverter
-
+ 
 @app.route('/')
 def index():
     posts = list(posts_collection.find())  # Retrieve all posts from MongoDB
