@@ -13,7 +13,7 @@
     - name: Pull Docker image from Azure Container Registry
       shell: docker pull 3345blog.azurecr.io/blogv2:{{ github.sha }}
 
-    - name: Create Azure Container Instance
+    - name: log in Azure Container Instance
       azure_rm_containerinstance:
         resource_group: blogacigroup
         name: blogaci
