@@ -1,69 +1,67 @@
-from flask import Flask, redirect, render_template, request, url_for
-from pymongo import MongoClient
-from bson import ObjectId
-from werkzeug.routing import BaseConverter
+from flask import Flask, render_template, request, redirect, url_for
+import requests
 
 app = Flask(__name__)
-client = MongoClient('mongodb://blogdbaccount:DJeiV2yZlFvd2EpoLQNNYCdEwmrgLsy8nkirggYZGHlw2fXSHpCXP7GnijKugivxR24ZW4uhlvTwACDbgxdwUQ==@blogdbaccount.mongo.cosmos.azure.com:10255/?ssl=true&retrywrites=false&replicaSet=globaldb&maxIdleTimeMS=120000&appName=@blogdbaccount@')  # Connect to your MongoDB instance
-db = client['blogdatabase']  # Use or create a database named 'blog_db'
-posts_collection = db['posts']  # Create or use a collection named 'posts'
- 
-class ObjectIdConverter(BaseConverter):
-    def to_python(self, value):
-        try:
-            return ObjectId(value)
-        except:
-            raise ValueError()
+backend_url = "http://localhost:5000/posts"
 
-    def to_url(self, value):
-        return str(value)
- 
-app.url_map.converters['ObjectId'] = ObjectIdConverter
- 
 @app.route('/')
 def index():
-    posts = list(posts_collection.find())  # Retrieve all posts from MongoDB
+    response = requests.get(backend_url)
+    if response.status_code == 200:
+        posts = response.json()
+    else:
+        posts = []
     return render_template('index.html', posts=posts)
- 
+
 @app.route('/create', methods=['GET', 'POST'])
 def create_post():
     if request.method == 'POST':
         title = request.form['title']
         content = request.form['content']
-        
-        # Include the shard key field and value
         scale_value = 'your_scale_value_here'  # Determine the appropriate value for your shard key field
 
         new_post = {
             'title': title,
             'content': content,
-            'scale': scale_value  # Include the shard key field with its value
+            'scale': scale_value
         }
 
-        posts_collection.insert_one(new_post)  # Insert a new post into MongoDB
-        return redirect(url_for('index'))
+        response = requests.post(backend_url, json=new_post)
+        if response.status_code == 201:
+            return redirect(url_for('index'))
+        else:
+            return "Error creating post", response.status_code
     return render_template('create_post.html')
 
-
-@app.route('/edit_post/<ObjectId:post_id>', methods=['GET', 'POST'])
+@app.route('/edit_post/<string:post_id>', methods=['GET', 'POST'])
 def edit_post(post_id):
-    post = posts_collection.find_one({'_id': post_id})
+    post_url = f"{backend_url}/{post_id}"
     if request.method == 'POST':
-        post['title'] = request.form['title']
-        post['content'] = request.form['content']
-        posts_collection.replace_one({'_id': post_id}, post)  # Update the post in MongoDB
-        return redirect(url_for('index'))
-    return render_template('edit_post.html', post=post)
+        updated_post = {
+            'title': request.form['title'],
+            'content': request.form['content']
+        }
+        response = requests.put(post_url, json=updated_post)
+        if response.status_code == 200:
+            return redirect(url_for('index'))
+        else:
+            return "Error updating post", response.status_code
+    else:
+        response = requests.get(post_url)
+        if response.status_code == 200:
+            post = response.json()
+        else:
+            post = None
+        return render_template('edit_post.html', post=post)
 
-
-@app.route('/delete_post/<ObjectId:post_id>', methods=['GET', 'POST'])
+@app.route('/delete_post/<string:post_id>', methods=['POST'])
 def delete_post(post_id):
-    if request.method == 'POST':
-        posts_collection.delete_one({'_id': post_id})  # Delete the post from MongoDB
+    post_url = f"{backend_url}/{post_id}"
+    response = requests.delete(post_url)
+    if response.status_code == 200:
         return redirect(url_for('index'))
-    # Handle other cases, like GET requests or invalid post_id
-    return "Invalid request"
-
+    else:
+        return "Error deleting post", response.status_code
 
 if __name__ == '__main__':
     app.run(debug=True, host="0.0.0.0", port=80)
